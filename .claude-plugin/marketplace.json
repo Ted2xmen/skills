@@ -12,6 +12,10 @@
     {
       "name": "snapshot",
       "source": "./snapshot"
+    },
+    {
+      "name": "dive",
+      "source": "./dive"
     }
   ]
 }

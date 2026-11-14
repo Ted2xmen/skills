@@ -1,0 +1,8 @@
+{
+  "name": "dive",
+  "version": "0.1.0",
+  "description": "Read-only code inspection: a vet of the staged diff before every commit (via hook), a milestone audit with a go/no-go verdict, and on-demand reviews by scope and lens",
+  "author": { "name": "Ted2xmen" },
+  "repository": "https://github.com/Ted2xmen/skills",
+  "license": "MIT"
+}
