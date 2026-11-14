@@ -1,0 +1,8 @@
+{
+  "name": "snapshot",
+  "version": "0.1.0",
+  "description": "Write and sync SNAPSHOT.md: a code-verified picture of what a codebase does right now",
+  "author": { "name": "Ted2xmen" },
+  "repository": "https://github.com/Ted2xmen/skills",
+  "license": "MIT"
+}

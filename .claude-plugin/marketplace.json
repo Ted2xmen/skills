@@ -1,11 +1,17 @@
 {
   "name": "ted2xmen-skills",
   "description": "Claude Code skills and output styles by Ted2xmen",
-  "owner": { "name": "Ted2xmen" },
+  "owner": {
+    "name": "Ted2xmen"
+  },
   "plugins": [
     {
       "name": "exact",
       "source": "./exact"
+    },
+    {
+      "name": "snapshot",
+      "source": "./snapshot"
     }
   ]
 }
