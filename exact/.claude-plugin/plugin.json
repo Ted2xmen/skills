@@ -1,0 +1,8 @@
+{
+  "name": "exact",
+  "version": "0.1.0",
+  "description": "Output styles for terse replies that keep every number, condition, caveat and verification status",
+  "author": { "name": "Ted2xmen" },
+  "repository": "https://github.com/Ted2xmen/skills",
+  "license": "MIT"
+}
