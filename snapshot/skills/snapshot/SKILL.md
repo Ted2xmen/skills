@@ -1,14 +1,14 @@
 ---
 name: snapshot
 description: >
-  Write, update or fully sync SNAPSHOT.md and its domain docs (for example ECONOMY.md, SIMULATION.md): the documents
+  Write, update or fully sync SNAPSHOT.md and its domain docs: the documents
   that answer "what does this product do right now, and how?" for anyone — the developer ("what is the free story
   limit?"), an agent writing App Store copy, or an outsider learning the app. Covers what the product does, features
   (user view and technical view), sign-in, roles and permissions, limits and gates, integrations, remote-controlled
   values and stack, each fact checked against the code with a source. Any language, any repo layout. Use after a task
-  that changed a product fact (limit, price, balance value, feature, sign-in, permission, integration, remote value),
+  that changed a product fact (limit, price, config value, feature, sign-in, permission, integration, remote value),
   or when the user says "snapshot", "take a snapshot", "sync the snapshot", "update SNAPSHOT.md", "what does this
-  app do", "snapshot al", "snapshot'ı güncelle".
+  app do".
 ---
 
 # snapshot
@@ -24,15 +24,15 @@ snapshot, because people and agents make decisions on it. Treat a doc/code misma
 | Document | Role | Required |
 |---|---|---|
 | `SNAPSHOT.md` | **Hub.** What the product is, features, access, limits, integrations, stack. Links to the domain docs. At most 500 lines. | yes |
-| Domain docs, e.g. `ECONOMY.md`, `SIMULATION.md`, `PERMISSIONS.md`, `API.md` | **Detail for one domain.** All numbers or all mechanics of that domain in one place. | only when a domain is too large for the hub |
+| Domain docs, e.g. `PRICING.md`, `PERMISSIONS.md`, `API.md` | **Detail for one domain.** All numbers or all mechanics of that domain in one place. | only when a domain is too large for the hub |
 
-The project may use other names: `PRODUCT.md` for the hub, `BALANCE.md` for the economy. Use the names the project
+The project may use other names, for example `PRODUCT.md` for the hub. Use the names the project
 already has. Create a domain doc only when its section would push the hub over 500 lines or needs a table of more
-than about 20 rows. Typical cases: a game economy (prices, costs, rewards), a simulation or rules engine (pipeline,
-formula coupling), a large role and permission matrix, a public API.
+than about 20 rows. Typical cases: a large price and plan table, a rules engine or
+processing pipeline, a large role and permission matrix, a public API.
 
-**One fact, one place, across the whole set.** A drink price lives in ECONOMY.md only. The hub says "prices: see
-ECONOMY.md §Drinks", not the number. Two copies of a number drift apart, and then the set gives two answers.
+**One fact, one place, across the whole set.** A plan price lives in PRICING.md only. The hub says "prices: see
+PRICING.md §Plans", not the number. Two copies of a number drift apart, and then the set gives two answers.
 
 ## Readers
 
@@ -42,7 +42,7 @@ Write so that each reader gets an answer without reading the code:
 |---|---|---|
 | Developer | "What is the free story limit?" | Limits table in the hub, or the domain doc it links |
 | Agent writing store or marketing copy | "What can a user do? What is free?" | What it does, the **User** lines, Limits |
-| Agent changing code | "How does the tick pipeline work? Where?" | the **Technical** lines, the domain docs, sources |
+| Agent changing code | "How does the import pipeline work? Where?" | the **Technical** lines, the domain docs, sources |
 | Outsider | "What is this app?" | What it does, Features |
 
 Three writing rules follow:
@@ -55,7 +55,7 @@ Three writing rules follow:
 
 ## Sources
 
-Give every fact a source as **file + symbol**: `src/limits.ts` `FREE_DAILY_STORIES`, `game/drinks.ts` `DRINKS.latte`.
+Give every fact a source as **file + symbol**: `src/limits.ts` `FREE_DAILY_STORIES`, `src/billing/plans.ts` `PLANS.team`.
 A symbol survives edits that move lines. Add a line number only for a fact that has no symbol, such as a statement
 inside a function: `src/auth/guard.ts:31`. A fact without a source becomes a stale fact.
 
@@ -67,7 +67,7 @@ Run after every task that changed a product fact. Change only the entries the ta
 domain doc that owns the fact.
 
 Update when a task changed:
-- a limit, quota, price, cost, reward, balance constant or feature-flag value,
+- a limit, quota, price, config constant or feature-flag value,
 - a feature: added, removed, or its behavior for the user changed,
 - engine or rules behavior described in a domain doc (pipeline order, formula, coupling),
 - sign-in methods, roles or permissions,
@@ -101,7 +101,7 @@ Run when the user asks for a snapshot, when no snapshot exists, or when an updat
    | # | Doc | Doc says | Code says | Source | Status |
    |---|---|---|---|---|---|
    | 1 | SNAPSHOT | Free users: 5 stories a day | 10 | src/limits.ts FREE_DAILY_STORIES | Wrong |
-   | 2 | ECONOMY | Latte $4.00 | $4.25 | game/drinks.ts DRINKS.latte | Wrong |
+   | 2 | PRICING | Team plan $8 | $10 | src/billing/plans.ts PLANS.team | Wrong |
    | 3 | SNAPSHOT | — | AdminPanel checks 4 permissions | src/admin/AdminPanel.tsx PERMISSIONS | Missing |
    ```
    Write after the user agrees, or directly if the user asked for a sync without review.
@@ -121,8 +121,8 @@ Ambiguous. Only the main session writes files.
 | Features and flows | routes, screens, pages, controllers, CLI commands, public API handlers |
 | Sign-in | auth config, provider setup, session and token code, "guest" or "anonymous" paths |
 | Roles and permissions | role enums, permission constants, guards, middleware, policy files, database row-level rules |
-| Limits, prices, balance | constants (`MAX_`, `LIMIT`, `FREE_`, `PRO_`, `QUOTA`, `PRICE`, `BALANCE`), config registries, entitlement checks, feature-flag reads |
-| Engine and rules | the main loop or pipeline (tick, scheduler, reducer), formula modules, event handlers and what state each writes |
+| Limits and prices | constants (`MAX_`, `LIMIT`, `FREE_`, `PRO_`, `QUOTA`, `PRICE`), config registries, entitlement checks, feature-flag reads |
+| Engine and rules | the main loop or pipeline (scheduler, queue worker, reducer), formula modules, event handlers and what state each writes |
 | Integrations | SDK imports, API clients, env var names (`*_API_KEY`, `*_URL`), webhook handlers |
 | Remote values | remote-config reads, `process.env` / `os.environ` / `ENV[...]`, server-side flags |
 | Stack | manifests and lockfiles: `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `Gemfile`, `composer.json`, `pubspec.yaml`, `build.gradle`, `Package.swift`, `*.csproj` |
@@ -138,7 +138,7 @@ Never copy secret values. Name the variable, not its value.
 ```markdown
 # SNAPSHOT — <product name>
 > Synced: YYYY-MM-DD · <short commit hash, if git>
-> Domain docs: [ECONOMY.md](ECONOMY.md) (prices, costs, rewards) · [SIMULATION.md](SIMULATION.md) (tick pipeline, coupling)
+> Domain docs: [PRICING.md](PRICING.md) (plans, prices) · [PERMISSIONS.md](PERMISSIONS.md) (roles, permissions)
 
 ## What it does
 <2–5 plain lines for an outsider: what the product is, who it is for, the main flow. No code words.>
@@ -188,16 +188,16 @@ Keep 2–4 bullets per side of a feature.
 ## Domain doc format
 
 ```markdown
-# ECONOMY — <product name>
+# PRICING — <product name>
 > Synced: YYYY-MM-DD · <short commit hash> · Hub: [SNAPSHOT.md](SNAPSHOT.md)
-> Owner of: drink prices, ingredient costs, wages, rewards. To change a value, edit the source in its row.
+> Owner of: plans, prices, seat limits. To change a value, edit the source in its row.
 
 ## <Topic>
-Source: `game/drinks.ts` `DRINKS`
+Source: `src/billing/plans.ts` `PLANS`
 
-| id | price | gate | source symbol |
+| id | price / month | seats | source symbol |
 |---|---|---|---|
-| latte | $4.25 | espresso ≥ 1, steamer ≥ 1 | `DRINKS.latte` |
+| team | $10 | up to 20 | `PLANS.team` |
 ```
 
 The header line "Owner of" lists what this document is the only place for. The hub links here instead of repeating it.
@@ -208,7 +208,7 @@ To make agents update the set as part of their work, add this to the project's `
 
 ```markdown
 ## Snapshot
-After a task that changes a product fact (a limit, price or balance value, a feature's user behavior, engine or
+After a task that changes a product fact (a limit, price or config value, a feature's user behavior, engine or
 rules behavior, sign-in, roles or permissions, an integration, a remote-config key or default), update the owning
 entry in SNAPSHOT.md or its domain doc with the snapshot skill (update mode). Not for refactors, styling or tests.
 ```
@@ -259,7 +259,7 @@ It needs `typescript` installed in the project. Without it, it exits and writes 
   decisions belong in the backlog or the history log.
 - **One fact per bullet.** If a bullet needs more than two sentences, split it or move the detail to a domain doc.
 - **`Why:` lines are allowed** for a value or a rule whose reason is not obvious from the code: one line, present
-  tense, no date. "Why: missions speed up income, they do not replace it." Not "Why: cut in June after the E1 audit."
+  tense, no date. "Why: guests can read but not save, so sign-up has a clear reason." Not "Why: changed in June after the March review."
   Do not add a `Why:` line to obvious values.
 - **The hub has at most 500 lines.** Check with `wc -l` before you save. If it is longer, move a domain to a domain
   doc. Never cut `What it does`, `Access`, or `Limits and gates` to fit. Split a domain doc by topic when it passes

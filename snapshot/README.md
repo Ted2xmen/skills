@@ -6,8 +6,8 @@ A Claude Code skill that writes and syncs `SNAPSHOT.md`: a technical picture of 
 > Free users get 10 exports a day. Stripe handles subscriptions.
 
 Every line is checked against the code and carries a source (file + symbol).
-Large domains get their own document, for example `ECONOMY.md` for a game economy or `SIMULATION.md` for a rules
-engine. `SNAPSHOT.md` stays the hub (at most 500 lines) and links to them. Each fact lives in one place.
+Large domains get their own document, for example `PRICING.md` for plans and prices or `PERMISSIONS.md` for a role
+matrix. `SNAPSHOT.md` stays the hub (at most 500 lines) and links to them. Each fact lives in one place.
 Before it changes the file, the skill shows a table of what was wrong, missing, gone or unverified.
 
 Works in any language and any repo layout.
