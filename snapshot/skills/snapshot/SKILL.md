@@ -2,8 +2,8 @@
 name: snapshot
 description: >
   Write, update or fully sync SNAPSHOT.md and its domain docs: the documents
-  that answer "what does this product do right now, and how?" for anyone — the developer ("what is the free story
-  limit?"), an agent writing App Store copy, or an outsider learning the app. Covers what the product does, features
+  that answer "what does this product do right now, and how?" for anyone: the developer ("what is the free export
+  limit?"), an agent writing marketing copy, or an outsider learning the product. Covers what the product does, features
   (user view and technical view), sign-in, roles and permissions, limits and gates, integrations, remote-controlled
   values and stack, each fact checked against the code with a source. Any language, any repo layout. Use after a task
   that changed a product fact (limit, price, config value, feature, sign-in, permission, integration, remote value),
@@ -16,7 +16,7 @@ description: >
 The snapshot answers one question: **what is this product, right now?** It describes the product and its technical
 state only. It is not a history log, not a plan and not a file map.
 
-The code is the only source of truth. A snapshot that says "5 free stories" when the code says 10 is worse than no
+The code is the only source of truth. A snapshot that says "5 free exports" when the code says 10 is worse than no
 snapshot, because people and agents make decisions on it. Treat a doc/code mismatch like a failing test.
 
 ## The document set
@@ -40,22 +40,22 @@ Write so that each reader gets an answer without reading the code:
 
 | Reader | Asks | Reads |
 |---|---|---|
-| Developer | "What is the free story limit?" | Limits table in the hub, or the domain doc it links |
+| Developer | "What is the free export limit?" | Limits table in the hub, or the domain doc it links |
 | Agent writing store or marketing copy | "What can a user do? What is free?" | What it does, the **User** lines, Limits |
 | Agent changing code | "How does the import pipeline work? Where?" | the **Technical** lines, the domain docs, sources |
 | Outsider | "What is this app?" | What it does, Features |
 
 Three writing rules follow:
 
-1. **User lines use product words, not code words.** "Read 10 stories a day for free", not "`FREE_DAILY_READS`
-   gates `StoryScreen`". A copywriter must be able to use the line as it is.
+1. **User lines use product words, not code words.** "Export 10 boards a day for free", not "`FREE_DAILY_EXPORTS`
+   gates `ExportDialog`". A copywriter must be able to use the line as it is.
 2. **Technical lines carry the code words and the source.**
 3. **Every fact stands alone.** One fact per row or bullet, with its number and unit, so a search for "limit" or
    "guest" finds a complete answer.
 
 ## Sources
 
-Give every fact a source as **file + symbol**: `src/limits.ts` `FREE_DAILY_STORIES`, `src/billing/plans.ts` `PLANS.team`.
+Give every fact a source as **file + symbol**: `src/limits.ts` `FREE_DAILY_EXPORTS`, `src/billing/plans.ts` `PLANS.team`.
 A symbol survives edits that move lines. Add a line number only for a fact that has no symbol, such as a statement
 inside a function: `src/auth/guard.ts:31`. A fact without a source becomes a stale fact.
 
@@ -85,7 +85,7 @@ Run when the user asks for a snapshot, when no snapshot exists, or when an updat
 
 1. **Find.** Search the repo for the hub (`SNAPSHOT.md`, or the project's own name for it) and the domain docs it
    links, case-insensitive, at any depth. Skip dependency and build folders (`node_modules`, `vendor`, `.venv`, `dist`,
-   `build`, `target`, `Pods`, `ios`, `android`). If the hub is missing, create it at the repo root and say so.
+   `build`, `target`, `Pods`, and `ios` / `android` when they are generated). If the hub is missing, create it at the repo root and say so.
 2. **Read the code.** Do not trust the documents while you collect facts. If the code index script is available, run
    it first and use the codemap block to find sources. Then use the table under "Where to look".
 3. **Classify** every claim:
@@ -100,9 +100,9 @@ Run when the user asks for a snapshot, when no snapshot exists, or when an updat
    ```
    | # | Doc | Doc says | Code says | Source | Status |
    |---|---|---|---|---|---|
-   | 1 | SNAPSHOT | Free users: 5 stories a day | 10 | src/limits.ts FREE_DAILY_STORIES | Wrong |
+   | 1 | SNAPSHOT | Free users: 5 exports a day | 10 | src/limits.ts FREE_DAILY_EXPORTS | Wrong |
    | 2 | PRICING | Team plan $8 | $10 | src/billing/plans.ts PLANS.team | Wrong |
-   | 3 | SNAPSHOT | — | AdminPanel checks 4 permissions | src/admin/AdminPanel.tsx PERMISSIONS | Missing |
+   | 3 | SNAPSHOT | (nothing) | AdminPanel checks 4 permissions | src/admin/AdminPanel.tsx PERMISSIONS | Missing |
    ```
    Write after the user agrees, or directly if the user asked for a sync without review.
 5. **Write.** Keep each author's structure and prose where it is still correct. Restructure only when a file is
@@ -129,14 +129,14 @@ Ambiguous. Only the main session writes files.
 | Inventory | count with a command (`ls`, `find`, `grep -c`). Write down how you counted. |
 
 When a value comes from outside the code, do not guess its runtime value. Write what the code does:
-"free story limit comes from remote config key `free_story_limit`, default 5, `src/config.ts` `DEFAULTS`".
+"free export limit comes from remote config key `free_export_limit`, default 5, `src/config.ts` `DEFAULTS`".
 
 Never copy secret values. Name the variable, not its value.
 
 ## Hub format
 
 ```markdown
-# SNAPSHOT — <product name>
+# SNAPSHOT: <product name>
 > Synced: YYYY-MM-DD · <short commit hash, if git>
 > Domain docs: [PRICING.md](PRICING.md) (plans, prices) · [PERMISSIONS.md](PERMISSIONS.md) (roles, permissions)
 
@@ -145,12 +145,12 @@ Never copy secret values. Name the variable, not its value.
 
 ## Features
 ### <Feature name>
-- **User:** what a user can do, when, and why it matters — in product words
+- **User:** what a user can do, when, and why it matters, in product words
 - **Technical:** how the code does it: key modules, data flow, edge cases · `src/feature/x.ts` `runFeature`
 
 ## Access
 - **Sign-in:** Google, GitHub and guest · `src/auth/providers.ts` `PROVIDERS`
-- **Guest:** can read stories, cannot save them · `src/auth/guard.ts:31`
+- **Guest:** can view boards, cannot export them · `src/auth/guard.ts:31`
 
 | Role or component | Permissions | Source |
 |---|---|---|
@@ -159,20 +159,20 @@ Never copy secret values. Name the variable, not its value.
 ## Limits and gates
 | Capability | Free | Paid | Source |
 |---|---|---|---|
-| Stories per day | 10 | unlimited | src/limits.ts `FREE_DAILY_STORIES` |
+| Exports per day | 10 | unlimited | src/limits.ts `FREE_DAILY_EXPORTS` |
 
 ## Integrations
 | Service | Purpose | Source |
 |---|---|---|
-| RevenueCat | subscriptions | src/billing/purchases.ts |
+| Stripe | subscriptions | src/billing/stripe.ts |
 
 ## Remote-controlled values
-- `free_story_limit`: remote config, default 5 · `src/config.ts` `DEFAULTS`
+- `free_export_limit`: remote config, default 5 · `src/config.ts` `DEFAULTS`
 
 ## Stack
 | Layer | Choice | Source |
 |---|---|---|
-| Framework | Expo SDK 54, React Native 0.81 | package.json |
+| Framework | Next.js 15, React 19 | package.json |
 
 ## Constants
 <!-- constants:start -->
@@ -188,7 +188,7 @@ Keep 2–4 bullets per side of a feature.
 ## Domain doc format
 
 ```markdown
-# PRICING — <product name>
+# PRICING: <product name>
 > Synced: YYYY-MM-DD · <short commit hash> · Hub: [SNAPSHOT.md](SNAPSHOT.md)
 > Owner of: plans, prices, seat limits. To change a value, edit the source in its row.
 
@@ -223,8 +223,11 @@ no network, no git commands.
 | `<!-- constants:start -->` … `<!-- constants:end -->` | SNAPSHOT.md | exported `UPPER_SNAKE_CASE` constants and `// @snapshot`-tagged variables: value, source, purpose |
 | `<!-- codemap:start -->` … `<!-- codemap:end -->` | CODEMAP.md | file → exports index: functions, classes, types, consts, with the first comment line |
 
+The script is in the `scripts/` folder next to this file, not in the project. Run it from the project root and call
+it by its full path:
+
 ```bash
-node scripts/code-index.js [project-root] [--constants] [--exports] [--only a,b] [--tagged] [--file SNAPSHOT.md] [--map CODEMAP.md]
+node <this skill's folder>/scripts/code-index.js [project-root] [--constants] [--exports] [--only a,b] [--tagged] [--file SNAPSHOT.md] [--map CODEMAP.md]
 ```
 
 - With no `--constants` or `--exports` flag, it fills every block whose markers exist. A file without markers is not written.

@@ -86,6 +86,6 @@ Unstaged: assets/old-logo.png (not part of this change)
 
 ## The gate
 
-The plugin's hook blocks a `git commit` once when the tree about to be committed has not been vetted. It lets the
+The plugin's hook blocks a `git commit` while the tree about to be committed has not been vetted. It lets the
 commit through for docs-only and lockfile-only diffs and for diffs under `VET_MIN_LINES` added lines of code
 (default 10). `VET_GATE=off` turns it off.

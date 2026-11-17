@@ -1,4 +1,4 @@
-# exact — examples
+# exact: examples
 
 Each case shows the padded original, a pure-compression rewrite that loses precision, and the exact rewrite.
 

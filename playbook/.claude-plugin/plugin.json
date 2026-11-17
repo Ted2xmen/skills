@@ -1,0 +1,8 @@
+{
+  "name": "playbook",
+  "version": "0.1.0",
+  "description": "Working methods for agents: plan, break down and verify any multi-step task, a debug flow, a brief template for delegating to subagents, and a PRD guide for new products",
+  "author": { "name": "Ted2xmen" },
+  "repository": "https://github.com/Ted2xmen/skills",
+  "license": "MIT"
+}

@@ -66,11 +66,15 @@ Add the markers once where you want each block:
 <!-- codemap:end -->
 ```
 
-Then run:
+Then ask the agent to run the code index, or run it yourself from the project root. The script sits in the
+`scripts/` folder of the skill. After a copy install that is:
 
 ```bash
 node ~/.claude/skills/snapshot/scripts/code-index.js . --only src/config,src/constants
 ```
+
+After a plugin install the skill lives in Claude Code's plugin folder, so let the agent run it: the skill tells it
+where the script is.
 
 It changes only the text between the markers, writes only when something changed, and redacts values whose names
 look like credentials. It needs `typescript` in the project.

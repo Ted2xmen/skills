@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse(Bash) hook: block a `git commit` once until the vet check has run on the exact tree
+# PreToolUse(Bash) hook: block a `git commit` until the vet check has run on the exact tree
 # being committed. The check itself is the `vet` skill; this script only decides when to ask for it.
 #
 # Lets the commit through when:
@@ -16,9 +16,18 @@ command -v jq >/dev/null 2>&1 || exit 0
 
 INPUT=$(cat)
 CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
-printf '%s' "$CMD" | grep -qE '(^|[^[:alnum:]_-])git([[:space:]]+-[^[:space:]]+([[:space:]]+[^-[:space:]][^[:space:]]*)?)*[[:space:]]+commit([[:space:]]|$)' || exit 0
+RE='(^|[^[:alnum:]_-])git([[:space:]]+-[^[:space:]]+([[:space:]]+[^-[:space:]][^[:space:]]*)?)*[[:space:]]+commit([[:space:]]|$)'
+[[ "$CMD" =~ $RE ]] || exit 0
 
-ROOT="${CLAUDE_PROJECT_DIR:-$PWD}"
+# The commit's own options: the text after `git commit`, without quoted strings (commit messages) and without
+# whatever follows the command (&&, ||, ;, |). Reading flags from the whole command line would take a "-a" inside a
+# message, or in a later command, for `commit -a`.
+ARGS=${CMD#*"${BASH_REMATCH[0]}"}
+ARGS=$(printf '%s' "$ARGS" | tr '\n' ' ' | sed -E "s/\"(\\\\.|[^\"\\\\])*\"//g; s/'[^']*'//g; s/(&&|\|\||;|\|).*//" 2>/dev/null) || ARGS=""
+
+# The repo is the one the command runs in: the hook input's cwd, then the project directory.
+ROOT=$(printf '%s' "$INPUT" | jq -r '.cwd // empty' 2>/dev/null)
+[ -n "$ROOT" ] && [ -d "$ROOT" ] || ROOT="${CLAUDE_PROJECT_DIR:-$PWD}"
 cd "$ROOT" 2>/dev/null || exit 0
 GIT_DIR=$(git rev-parse --absolute-git-dir 2>/dev/null) || exit 0
 MARKER="$GIT_DIR/vet-checked"
@@ -27,7 +36,7 @@ MARKER="$GIT_DIR/vet-checked"
 TMP_INDEX=""
 cleanup() { [ -n "$TMP_INDEX" ] && rm -f "$TMP_INDEX"; }
 trap cleanup EXIT
-if printf '%s' "$CMD" | grep -qE '[[:space:]](-[[:alnum:]]*a[[:alnum:]]*|--all)([[:space:]]|$)'; then
+if printf '%s' "$ARGS" | grep -qE '(^|[[:space:]])(-[[:alnum:]]*a[[:alnum:]]*|--all)([[:space:]]|$)'; then
   TMP_INDEX=$(mktemp) || exit 0
   cp "$GIT_DIR/index" "$TMP_INDEX" 2>/dev/null || : > "$TMP_INDEX"
   GIT_INDEX_FILE="$TMP_INDEX" git add -u 2>/dev/null || exit 0
@@ -38,9 +47,12 @@ TREE=$(git write-tree 2>/dev/null) || exit 0
 [ -f "$MARKER" ] && [ "$(cat "$MARKER" 2>/dev/null)" = "$TREE" ] && exit 0
 
 # Count added lines in code files only.
-IGNORE='(\.(md|mdx|markdown|txt|rst|adoc)$|(^|/)docs?/|(^|/)(package-lock\.json|yarn\.lock|pnpm-lock\.yaml|bun\.lockb?|Podfile\.lock|Cargo\.lock|poetry\.lock|uv\.lock|Gemfile\.lock|composer\.lock|go\.sum)$|(^|/)LICENSE)'
+# Dots are written [.] because awk -v would unescape a backslash-dot into a plain dot.
+IGNORE='([.](md|mdx|markdown|txt|rst|adoc)$|(^|/)docs?/|(^|/)(package-lock[.]json|yarn[.]lock|pnpm-lock[.]yaml|bun[.]lockb?|Podfile[.]lock|Cargo[.]lock|poetry[.]lock|uv[.]lock|Gemfile[.]lock|composer[.]lock|go[.]sum)$|(^|/)LICENSE([.][[:alnum:]]+)?$)'
 ADDED=$(git diff --cached --numstat 2>/dev/null | awk -F'\t' -v re="$IGNORE" '$1 != "-" && $3 !~ re { s += $1 } END { print s + 0 }')
-[ "$ADDED" -lt "${VET_MIN_LINES:-10}" ] && exit 0
+MIN="${VET_MIN_LINES:-10}"
+case "$MIN" in '' | *[!0-9]*) MIN=10 ;; esac
+[ "$ADDED" -lt "$MIN" ] && exit 0
 
 REASON="Commit paused by the vet gate: the staged diff adds $ADDED lines of code and has not been checked yet.
 Run the vet skill on the staged diff before committing (it spawns a fresh read-only subagent, then you act on

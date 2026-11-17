@@ -22,7 +22,7 @@ vet asks five questions of the lines the staged diff adds or changes:
 5. Does it touch files outside the change, or leak a secret?
 
 The plugin ships a `PreToolUse` hook. When the agent runs `git commit`, the hook checks the tree about to be
-committed. If that tree has not been vetted, it blocks the commit once and asks the agent to run vet. The agent then:
+committed. If that tree has not been vetted, it blocks the commit and asks the agent to run vet. The agent then:
 
 1. spawns a fresh read-only subagent that did not write the change, with the staged diff and the five questions
 2. checks each finding itself, fixes the confirmed ones (needless-code fixes only when low risk), and lists the rest

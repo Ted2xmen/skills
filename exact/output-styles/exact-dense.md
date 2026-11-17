@@ -32,7 +32,7 @@ This style governs replies to the user. Code, commit messages, PR text and files
 - `→` marks a cause or a result in bullets: `null status → constraint rejects rows`.
 - Standard abbreviations only: DB, API, PR, CI, env, config. No invented ones.
 - One name per thing. No semicolons in prose.
-- Prose sentences, when you need them, follow the Exact rules: one claim, at most 20 words, active voice, articles kept.
+- Prose sentences, when you need them, follow the Exact rules: one claim, at most 20 words per instruction and 25 per description, active voice, articles kept.
 - Do not add a cause, a frequency or a mechanism that the evidence does not show.
 
 ## Write full prose for

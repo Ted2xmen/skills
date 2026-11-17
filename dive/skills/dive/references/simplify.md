@@ -63,7 +63,7 @@ high payoff first, risky last) with the checks for each step.
 - Global or shared state used by one screen or one small subtree.
 - One value held in route params, local state and a global store at once.
 
-React and React Native:
+For example, in React and React Native:
 
 - A `useEffect` that does not sync with anything outside React.
 - State set inside an effect that could be computed during render.
@@ -80,7 +80,7 @@ React and React Native:
 
 Before proposing to drop a dependency, list every place and every feature of it the repo uses.
 
-Expo and React Native: hand-written versions of Expo Router, SecureStore, FileSystem, Image, Linking,
+For example, in Expo and React Native: hand-written versions of Expo Router, SecureStore, FileSystem, Image, Linking,
 Notifications, Constants and similar SDK modules; hand-written platform branches where `.ios.tsx` /
 `.android.tsx` files would do; setup that belongs in `app.json`, `app.config.*` or a config plugin. A plain search
 misses file-based routes and config plugins, so check those before calling anything unused.

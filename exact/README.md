@@ -19,7 +19,7 @@ and still say exactly what Claude knows, with the same certainty.
 | Hedges and certainty | kept | not specified | kept, never upgraded |
 | Conditions and scope | kept | not specified | kept |
 | Verification status (ran vs. read) | varies | not specified | always stated |
-| Sentence rules | none | none | one claim, ≤25 words, active voice, one name per thing |
+| Sentence rules | none | none | one claim, ≤20 words per instruction and ≤25 per description, active voice, one name per thing |
 | Self-check before sending | no | no | 5 checks |
 
 "Not specified" means the built-in style does not state a rule for it.
@@ -53,7 +53,6 @@ Both styles set `keep-coding-instructions: true`, so Claude keeps its built-in s
 
 See [examples.md](examples.md) for before/after cases.
 
-
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
